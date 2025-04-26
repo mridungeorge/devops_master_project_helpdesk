@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -21,16 +20,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoreHorizontal, Search, ArrowUpDown } from 'lucide-react';
 import { Ticket, TicketPriority, TicketStatus } from '@/contexts/TicketContext';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface TicketListProps {
   tickets: Ticket[];
   onView?: (ticket: Ticket) => void;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const TicketList: React.FC<TicketListProps> = ({ tickets, onView }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<keyof Ticket>('createdAt');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +84,6 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onView }) => {
     }
   };
 
-  // Filter and sort the tickets
   const filteredTickets = tickets
     .filter(ticket => 
       ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,6 +125,12 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onView }) => {
       
       return 0;
     });
+
+  const totalPages = Math.ceil(filteredTickets.length / ITEMS_PER_PAGE);
+  const paginatedTickets = filteredTickets.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="space-y-4">
@@ -184,14 +199,14 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onView }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTickets.length === 0 ? (
+            {paginatedTickets.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
                   No tickets found.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredTickets.map((ticket) => (
+              paginatedTickets.map((ticket) => (
                 <TableRow 
                   key={ticket.id}
                   className="cursor-pointer hover:bg-muted/50"
@@ -265,6 +280,39 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onView }) => {
           </TableBody>
         </Table>
       </div>
+
+      {filteredTickets.length > ITEMS_PER_PAGE && (
+        <div className="mt-4 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
