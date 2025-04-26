@@ -1,0 +1,31 @@
+
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_ENABLE_AI_FEATURES=${VITE_ENABLE_AI_FEATURES}
+      - VITE_APP_VERSION=${VITE_APP_VERSION}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # For development only - comment out in production
+      # - ./src:/app/src
+
+networks:
+  default:
+    name: devops-network

@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { 
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,

@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from './AuthContext';
 import { mockTickets } from './mockData';
-import { Ticket, TicketContextType } from './types';
+import { Ticket, TicketContextType, Comment } from './types';
 
 export * from './types';
 
@@ -61,7 +61,7 @@ export const TicketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const addComment = (ticketId: string, content: string, author: User) => {
-    const comment: Comment = {
+    const newComment: Comment = {
       id: `comment-${Date.now()}`,
       ticketId,
       content,
@@ -74,7 +74,7 @@ export const TicketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return {
           ...ticket,
           updatedAt: new Date().toISOString(),
-          comments: [...ticket.comments, comment]
+          comments: [...ticket.comments, newComment]
         };
       }
       return ticket;

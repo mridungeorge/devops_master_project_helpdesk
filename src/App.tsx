@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,7 @@ import Team from "./pages/Team";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import HealthCheck from "./pages/HealthCheck";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +87,8 @@ const App = () => (
                       </ProtectedRoute>
                     } 
                   />
+                  
+                  <Route path="/health" element={<HealthCheck />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>
